@@ -1,0 +1,32 @@
+
+services:
+
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: govai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+
+  app:
+    build: .
+    container_name: govai-app
+    depends_on:
+      - postgres
+      - ollama
+    ports:
+      - "8080:8080"
+
+volumes:
+  ollama:
