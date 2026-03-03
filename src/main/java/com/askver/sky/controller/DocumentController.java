@@ -1,11 +1,12 @@
 package com.askver.sky.controller;
 
 import com.askver.sky.service.DocumentService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.askver.sky.userdetail.CustomUserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/documents")
@@ -18,10 +19,19 @@ public class DocumentController {
     }
 
     @PostMapping("/upload")
-    public String upload(@RequestParam MultipartFile file)
-            throws Exception {
+    public String upload(
+            @RequestParam MultipartFile file,
+            Authentication authentication
+    ) throws Exception {
 
-        service.uploadPdf(file);
-        return "Uploaded & Indexed";
+        CustomUserDetails user =
+                (CustomUserDetails)
+                        authentication.getPrincipal();
+
+        UUID companyId = user.getCompanyId();
+
+        service.uploadPdf(file, companyId);
+
+        return "Uploaded & Indexed Successfully";
     }
 }

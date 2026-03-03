@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DocumentService {
@@ -18,15 +19,28 @@ public class DocumentService {
         this.vectorStore = vectorStore;
     }
 
-    public void uploadPdf(MultipartFile file) throws Exception {
+    public void uploadPdf(
+            MultipartFile file,
+            UUID companyId
+    ) throws Exception {
 
-         PagePdfDocumentReader reader = new PagePdfDocumentReader(file.getResource());
+        PagePdfDocumentReader reader =
+                new PagePdfDocumentReader(file.getResource());
+
         List<Document> documents = reader.get();
 
-          TokenTextSplitter splitter = new TokenTextSplitter();
+        TokenTextSplitter splitter =
+                new TokenTextSplitter();
 
-         List<Document> chunkedDocuments = splitter.apply(documents);
+        List<Document> splitDocs =
+                splitter.apply(documents);
 
-         vectorStore.add(chunkedDocuments);
+        splitDocs.forEach(doc ->
+                doc.getMetadata()
+                        .put("companyId",
+                                companyId.toString())
+        );
+
+        vectorStore.add(splitDocs);
     }
 }

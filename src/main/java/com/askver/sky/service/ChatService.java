@@ -1,7 +1,10 @@
 package com.askver.sky.service;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class ChatService {
@@ -12,7 +15,20 @@ public class ChatService {
         this.chatClient = chatClient;
     }
 
-    public String ask(String question) {
+
+    public String ask(
+            String question,
+            UUID companyId
+    ) {
+
+        SearchRequest request =
+                SearchRequest.builder()
+                        .query(question)
+                        .filterExpression(
+                                "companyId == '" + companyId + "'"
+                        )
+                        .topK(5)
+                        .build();
 
         return chatClient
                 .prompt()

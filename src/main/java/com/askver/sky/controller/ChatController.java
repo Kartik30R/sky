@@ -2,6 +2,8 @@ package com.askver.sky.controller;
 
 import com.askver.sky.DTO.ChatRequest;
 import com.askver.sky.service.ChatService;
+import com.askver.sky.userdetail.CustomUserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +17,17 @@ public class ChatController {
     }
 
     @PostMapping
-    public String ask(@RequestBody ChatRequest request) {
-        return service.ask(request.getMessage());
-    }
-}
+    public String ask(
+            @RequestBody ChatRequest req,
+            Authentication authentication
+    ) {
+
+        CustomUserDetails user =
+                (CustomUserDetails)
+                        authentication.getPrincipal();
+
+        return service.ask(
+                req.getMessage(),
+                user.getCompanyId()
+        );
+    }}
