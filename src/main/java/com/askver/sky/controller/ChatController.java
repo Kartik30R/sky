@@ -18,16 +18,19 @@ public class ChatController {
 
     @PostMapping
     public String ask(
-            @RequestBody ChatRequest req,
+            @RequestBody ChatRequest request,
             Authentication authentication
     ) {
 
         CustomUserDetails user =
                 (CustomUserDetails)
                         authentication.getPrincipal();
-
+        if (request.getMessage() == null || request.getMessage().isBlank()) {
+            return "Please provide a question.";
+        }
         return service.ask(
-                req.getMessage(),
-                user.getCompanyId()
+                request.getMessage(),
+                user.getCompanyId(),
+                user.getUserId()
         );
     }}
