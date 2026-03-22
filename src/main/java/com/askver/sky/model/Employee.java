@@ -21,6 +21,6 @@ public class Employee {
     private Company company;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.ROLE_EMPLOYEE;
+    private Role role;
 
 }

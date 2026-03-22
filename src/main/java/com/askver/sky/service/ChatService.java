@@ -24,19 +24,22 @@ public class ChatService {
         this.chatMemory = chatMemory;
     }
 
-    public String ask(String question, UUID companyId, UUID userId) {
+   
+    public String ask(String question, UUID companyId, UUID userId, String department) {
+
+        String filter = "companyId == '" + companyId + "' && department == '" + department.toLowerCase() + "'";
 
          SearchRequest request = SearchRequest.builder()
                 .query(question)
-                .filterExpression("companyId == '" + companyId + "'")
+                .filterExpression(filter)
                 .topK(5)
                 .build();
 
         return chatClient
                 .prompt()
                 .system("""
-                    You are an AI assistant helping company employees understand documents.
-                    Answer strictly using retrieved documents. If not found, say you don't know.
+                    You are an AI assistant helping company employees understand their department's documents.
+                    Answer strictly using the retrieved documents. If the answer is not found, say you don't know.
                     """)
                 .advisors(
                          new QuestionAnswerAdvisor(vectorStore, request),
